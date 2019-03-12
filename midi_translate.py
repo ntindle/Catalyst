@@ -18,3 +18,12 @@ class MIDIHandler(server.handler)
                 key = command.params.key
                 velocity = command.params.velocity
                 print('Someone hit the key {} with velocity {}'.format(key, velocity)
+
+
+def main():
+	server = new server()
+	server.add_handler(MIDIHandler)
+	server.serve_forever()
+
+if __name__ == '__main__':
+	main()
