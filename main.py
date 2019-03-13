@@ -89,14 +89,8 @@ def pushMIDI(unity_str):
         if mk3_msg is None:
             print("Unity string was improperly formatted, so no MIDI message to send.")
         else:
-            with mido.open_output('Python App', autoreset=True, virtual=True) as port:
-                print('Using {}'.format(port))
-                print('Sending {}'.format(mk3_msg))
-
-                # BUG, skips first itteration??
-                for x in range(2):
-                    port.send(mk3_msg)
-                    time.sleep(.25)
+            print('Sending {}'.format(mk3_msg))
+            port.send(mk3_msg)
 
 
 
@@ -112,28 +106,31 @@ def main():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.bind((TCP_IP, TCP_PORT))
     s.listen(1)
+    with mido.open_output('Python App', autoreset=True, virtual=True) as port:
 
-    while 1:
-        conn, addr = s.accept()
-        print('Connection address:' + addr[0])
-
+        time.sleep(0.25)
+        print('Using {}'.format(port))
         while 1:
-            try:
-                data = conn.recv(BUFFER_SIZE)
-                if not data:
-                    #not messages received from socket
-                    break
-                data_str = data.decode("utf-8")
-                print("received data: " + data_str)
-                pushMIDI(data_str)
-                conn.send(data)
-            except:
-                print('Error: no IP')
-                conn.close()
 
-                sys.exit()
+            conn, addr = s.accept()
+            print('Connection address:' + addr[0])
+            while 1:
+                try:
+                    data = conn.recv(BUFFER_SIZE)
+                    if not data:
+                        #not messages received from socket
+                        break
+                    data_str = data.decode("utf-8")
+                    print("received data: " + data_str)
+                    pushMIDI(data_str)
+                    conn.send(data)
+                except:
+                    print('Error: no IP')
+                    conn.close()
 
-    conn.close()
+                    sys.exit()
+
+        conn.close()
 
 
 if __name__ == '__main__':
