@@ -1,7 +1,7 @@
 # Adapted from: https://github.com/mido/mido/blob/master/examples/ports/send.py
 #!/usr/bin/env python
 """
-Send random notes to the output port.
+Translate Unity-generated strings with MIDI information into valid MIDI messages, then writing them to a port
 """
 
 from __future__ import print_function
@@ -10,11 +10,6 @@ import time
 import random
 import mido
 from mido import Message
-
-portname = None
-
-# A pentatonic scale
-notes = [60, 62, 64, 67, 69, 72]
 
 def noteToInt(note):
 	note_value = 0
@@ -74,7 +69,7 @@ def main():
 	else:
     	unity_msg = sys.argv[1]
     	mk3_msg = parseUnityString(unity_msg)
-		with mido.open_output(portname, autoreset=True) as port:
+		with mido.open_output('Python App', autoreset=True, virtual=True) as port:
 		    print('Using {}'.format(port)) 
 	        port.send(mk3_msg)
 
