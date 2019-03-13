@@ -8,12 +8,14 @@ from __future__ import print_function
 import sys
 import time
 import random
+import subprocess
 import socket
 import mido
 from mido import Message
 
 
-dummyString = "17:45:43.836, whatever, note_on, 0, C1 127"
+dummyString = "17:45:43.836, whatever, note_off, 1, C1 127"
+# 17:45:43.836, whatever, note_on, 1, C#1 127
 
 
 def noteToInt(note):
@@ -90,7 +92,14 @@ def pushMIDI(unity_str):
             with mido.open_output('Python App', autoreset=True, virtual=True) as port:
                 print('Using {}'.format(port))
                 print('Sending {}'.format(mk3_msg))
-                port.send(mk3_msg)
+
+                # BUG, skips first itteration??
+                for x in range(2):
+                    port.send(mk3_msg)
+                    time.sleep(.25)
+
+
+
 
 
 def main():
@@ -107,14 +116,22 @@ def main():
     while 1:
         conn, addr = s.accept()
         print('Connection address:' + addr[0])
-        data = conn.recv(BUFFER_SIZE)
-        if not data:
-            #not messages received from socket
-            break
-        data_str = data.decode("utf-8")
-        print("received data: " + data_str)
-        pushMIDI(data_str)
-        conn.send(data)
+
+        while 1:
+            try:
+                data = conn.recv(BUFFER_SIZE)
+                if not data:
+                    #not messages received from socket
+                    break
+                data_str = data.decode("utf-8")
+                print("received data: " + data_str)
+                pushMIDI(data_str)
+                conn.send(data)
+            except:
+                print('Error: no IP')
+                conn.close()
+
+                sys.exit()
 
     conn.close()
 
