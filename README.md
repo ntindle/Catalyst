@@ -20,6 +20,9 @@ The Python script opens a virtual port, through which it can communicate with th
 
 # Acknowledgements:
 Thanks to Native Instruments for lending us a Maschine MK3 controller for developing testing, and impromptu jamming!
+
 We are so grateful to the mentors at the SXSW Hackathon who helped us work out AR kinks and gave us invaluable feedback and advice.
+
 We used a Magic Leap One headset, paired with the Unity engine, to develop the AR environment.
+
 To manage MIDI data in Python, we used Mido.  You can find it here: https://github.com/mido/mido
