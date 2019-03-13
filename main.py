@@ -20,8 +20,11 @@ def noteToInt(note):
     note_value = 0
     length = len(note)
     if (note[length - 2] != "-"):
-        octave = int(note[length - 1]) + 1
+        octave = int(note[length - 1]) + 2
         note_value += 12 * octave
+    elif(note[length - 1] == "1"):
+        note_value += 12
+
     if (note[0] == 'C'):
         if (note[1] == '#'):
             note_value += 1
@@ -59,10 +62,18 @@ def getMapping(unity_note):
 
 def parseUnityString(in_str):
     components = in_str.split(", ")
+    length = len(components)
+    if(length != 5):
+        print("Invalid Unity input string.  Expected exactly 4 comma-separated components.")
+        return None
     mk3_msg = components[2]
     chnl = int(components[3])
     note_str = components[4]
     note_velocity = note_str.split()
+    nv_length = len(note_velocity)
+    if(nv_length != 2):
+        print("Last component of Unity input string improperly formatted.")
+        return None
     unity_note = noteToInt(note_velocity[0])
     mk3_note = getMapping(unity_note)
     vel = int(note_velocity[1])
@@ -73,10 +84,13 @@ def parseUnityString(in_str):
 def pushMIDI(unity_str):
         unity_msg = unity_str
         mk3_msg = parseUnityString(unity_msg)
-        with mido.open_output('Python App', autoreset=True, virtual=True) as port:
-            print('Using {}'.format(port))
-            print('Sending {}'.format(mk3_msg))
-            port.send(mk3_msg)
+        if mk3_msg is None:
+            print("Unity string was improperly formatted, so no MIDI message to send.")
+        else:
+            with mido.open_output('Python App', autoreset=True, virtual=True) as port:
+                print('Using {}'.format(port))
+                print('Sending {}'.format(mk3_msg))
+                port.send(mk3_msg)
 
 
 def main():
