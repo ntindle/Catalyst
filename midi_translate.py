@@ -1,29 +1,30 @@
-# MIDIHandler adapted from pymidi:
-# https://pypi.org/project/pymidi/#description
+# Adapted from: https://github.com/mido/mido/blob/master/examples/ports/send.py
+#!/usr/bin/env python
+"""
+Send random notes to the output port.
+"""
 
-from pymidi import server
+from __future__ import print_function
+import sys
+import time
+import random
+import mido
+from mido import Message
 
-unity_to_mk3 = {} #we will populated this with the mapping of Unity Key IDs to MK3 keys
+portname = None
 
-class MIDIHandler(server.handler)
-    def on_peer_connected(self, peer):
-        print('Peer connected: {}'.format(peer))
+# A pentatonic scale
+notes = [60, 62, 64, 67, 69, 72]
 
-    def on_peer_disconnected(self, peer):
-        print('Peer disconnected: {}'.format(peer))
-
-    def on_midi_commands(self, command_list):
-        for command in command_list:
-            if command.command == 'note_on':
-                key = command.params.key
-                velocity = command.params.velocity
-                print('Someone hit the key {} with velocity {}'.format(key, velocity)
-
+def parseInputString(s):
+	
 
 def main():
-	server = new server()
-	server.add_handler(MIDIHandler)
-	server.serve_forever()
+	if len(sys.argv) > 1:
+    	portname = sys.argv[1]
+	else:
+    	portname = None
+	generateRandomNotes()
 
 if __name__ == '__main__':
 	main()
