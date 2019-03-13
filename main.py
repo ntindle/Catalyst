@@ -1,57 +1,5 @@
 # Adapted from: https://github.com/mido/mido/blob/master/examples/ports/send.py
 # !/usr/bin/env python
-# """
-# Send random notes to the output port.
-# """
-#
-# from __future__ import print_function
-# import sys
-# import time
-# import random
-# import mido
-# from mido import Message
-#
-# portname = None
-#
-# # A pentatonic scale
-# # notes = [20, 22, 24, 27, 29, 32]
-# notes = [36, 37, 38, 39, 40, 41]
-#
-#
-# def generateRandomNotes():
-#     try:
-#         with mido.open_output('Python App', autoreset=True, virtual=True) as port:
-#             print('Using {}'.format(port))
-#             while True:
-#                 note = random.choice(notes)
-#
-#                 on = Message('note_on', note=note, channel=0)
-#                 print('Sending {}'.format(on))
-#                 port.send(on)
-#                 time.sleep(0.05)
-#
-#                 off = Message('note_off', note=note, channel=0)
-#                 print('Sending {}'.format(off))
-#                 port.send(off)
-#                 time.sleep(0.1)
-#     except KeyboardInterrupt:
-#         pass
-#
-#
-# def main():
-#     if len(sys.argv) > 1:
-#         portname = sys.argv[1]
-#     else:
-#         portname = 'Python App'
-#     generateRandomNotes()
-#
-#
-# if __name__ == '__main__':
-#     main()
-
-
-# Adapted from: https://github.com/mido/mido/blob/master/examples/ports/send.py
-# !/usr/bin/env python
 """
 Translate Unity-generated strings with MIDI information into valid MIDI messages, then writing them to a port
 """
@@ -60,10 +8,13 @@ from __future__ import print_function
 import sys
 import time
 import random
+import socket
 import mido
 from mido import Message
 
+
 dummyString = "17:45:43.836, whatever, note_on, 0, C1 127"
+
 
 def noteToInt(note):
     note_value = 0
@@ -119,45 +70,38 @@ def parseUnityString(in_str):
     return msg
 
 
-def maincd():
-    if len(sys.argv) < 2:
-        print("Missing input string")
-        exit(1)
-    else:
-        unity_msg = dummyString
+def pushMIDI(unity_str):
+        unity_msg = unity_str
         mk3_msg = parseUnityString(unity_msg)
         with mido.open_output('Python App', autoreset=True, virtual=True) as port:
             print('Using {}'.format(port))
             port.send(mk3_msg)
 
 
+def main():
+    print('Starting...')
+    TCP_IP = '10.11.17.76'
+    TCP_IP = '172.20.10.10'
+    TCP_PORT = 5005
+    BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
+
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind((TCP_IP, TCP_PORT))
+    s.listen(1)
+
+    while 1:
+        conn, addr = s.accept()
+        print('Connection address:' + addr[0])
+        data = conn.recv(BUFFER_SIZE)
+        if not data:
+            #not messages received from socket
+            break
+        data_str = data.decode("utf-8")
+        print("received data: " + data_str)
+        pushMIDI(data_str)
+
+    conn.close()
+
+
 if __name__ == '__main__':
     main()
-
-# import socket
-#
-#
-# def pushmidi(midiStr):
-#     # do stuff
-#
-#
-#
-# print('Starting...')
-# # TCP_IP = '10.11.17.76'
-# TCP_IP = '172.20.10.10'
-# TCP_PORT = 5005
-# BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
-#
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# s.bind((TCP_IP, TCP_PORT))
-# s.listen(1)
-#
-# while 1:
-#     conn, addr = s.accept()
-#     print('Connection address:' + addr[0])
-#     data = conn.recv(BUFFER_SIZE)
-#     if not data: break
-#     print("received data: " + data.decode("utf-8"))
-#     pushmidi(data.decode("utf-8"))
-#
-# conn.close()
