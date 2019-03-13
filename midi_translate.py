@@ -15,7 +15,7 @@ def noteToInt(note):
 	note_value = 0
 	length = len(note)
 	if(note[length - 2] != "-"):
-		octave = note[length - 1] + 1
+		octave = int(note[length - 1]) + 1
 		note_value += 12 * octave
 	if(note[0] == 'C'):
 		if(note[1] == '#'):
@@ -53,7 +53,7 @@ def getMapping(unity_note):
 def parseUnityString(in_str):
 	components = in_str.split(", ")
 	mk3_msg = components[2]
-	chnl = components[3]
+	chnl = int(components[3])
 	note_str = components[4]
 	note_velocity = note_str.split()
 	unity_note = noteToInt(note_velocity[0])
