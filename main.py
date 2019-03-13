@@ -75,12 +75,13 @@ def pushMIDI(unity_str):
         mk3_msg = parseUnityString(unity_msg)
         with mido.open_output('Python App', autoreset=True, virtual=True) as port:
             print('Using {}'.format(port))
+            print('Sending {}'.format(mk3_msg))
             port.send(mk3_msg)
 
 
 def main():
     print('Starting...')
-    TCP_IP = '10.11.17.76'
+    #TCP_IP = '10.11.17.76'
     TCP_IP = '172.20.10.10'
     TCP_PORT = 5005
     BUFFER_SIZE = 1024  # Normally 1024, but we want fast response
@@ -99,6 +100,7 @@ def main():
         data_str = data.decode("utf-8")
         print("received data: " + data_str)
         pushMIDI(data_str)
+        conn.send(data)
 
     conn.close()
 
